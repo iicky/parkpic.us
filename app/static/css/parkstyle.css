@@ -1,0 +1,290 @@
+a {
+  text-decoration: none;
+}
+
+#menubar{
+  width:100%;
+  height:50px;
+  background: #222222;
+}
+
+.container {
+  width:100%;
+}
+
+#parkinfo, #photos, #clusterinfo, #similarinfo {
+  display: inline-block;
+  vertical-align: top;
+}
+
+#parkinfo {
+  width: 25%;
+  padding-left: 10;
+}
+
+#photos {
+  width: 45%;
+  text-align: center;
+}
+
+#clusterinfo {
+  width: 14%;
+}
+
+#similarinfo {
+  width: 15%;
+}
+
+#frontlogo {
+  text-align: center;
+  padding-top: 50px;
+}
+
+#frontquestion {
+  text-align: center;
+}
+
+#results {
+  width: 25%;
+  display: inline-block;
+  margin: auto;
+  border: 1px solid #c0c0c0;
+  display: none;
+}
+
+#results .item {
+  padding: 3px;
+  font-family: inherit;
+  border-bottom: 1px solid #c0c0c0;
+}
+
+#results .item:last-child {
+  border-bottom: 0px;
+}
+
+#results .item:hover {
+  background-color: #999966;
+  cursor: pointer;
+}
+
+#theresult {
+  color: #FF6600;
+  text-align: center;
+  padding: 5px;
+}
+
+#keyword {
+  width:25%;
+  text-align:center;
+}
+
+.hlight{
+  background-color: #999966;
+}
+
+.logoframe {
+    height: 30px;      /* equals max image height */
+    width: 60px;
+    white-space: nowrap;
+    text-align: center;
+    display: inline-block;
+}
+
+.helper {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+
+.logo {
+    vertical-align: middle;
+    max-height: 30px;
+    max-width: 60px;
+}
+
+.menuspacer {
+  height: 100%;
+  width: 25px;
+  display: inline-block;
+  vertical-align: middle;
+  text-align: center;
+  line-height: 50px;
+}
+
+.map {
+  position:relative;
+  height:60%;
+  width:100%;
+  margin:0;
+  align:center;
+}
+
+.menuactive {
+  color: #999966;
+  text-decoration: none;
+}
+
+.menu, .menu:visited{
+  height: 100%;
+  width: 80px;
+  display: inline-block;
+  vertical-align: middle;
+  text-align: center;
+  line-height: 50px;
+  color: #777777;
+  text-decoration: none;
+}
+
+.menu:hover {
+  color: #FF6600;
+  background: #000000;
+  text-decoration: none;
+
+}
+
+.menu:active {
+  color: #777777;
+  text-decoration: none;
+}
+
+.simscene, .simscene:visited, .simscene:active {
+  color: #777777;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.simscene:hover {
+  color: #FF6600;
+  text-decoration: none;
+}
+
+.markerhead {
+  color: #999966;
+  font-weight: bold;
+  font-size: 14pt;
+}
+
+.markertext {
+  color: #777777;
+  font-weight: bold;
+}
+
+.test{
+  border: 1px solid black;
+}
+
+#topphotos {
+  text-align: center;
+  vertical-align:middle;
+  display:inline-block;
+  font-size: 0;
+  display: none;
+  padding-top: 20px;
+}
+
+.topimg {
+  height: 150px;
+  width: 150px;
+  display:inline-block;
+}
+
+.photoscroll {
+    height:150px;
+    width: 25px;
+    line-height: 150px;
+    display:inline-block;
+    vertical-align:middle;
+    text-align: center;
+    font-size: 16pt;
+    color: #FF6600;
+    cursor: pointer;
+}
+
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.imgwrapper {
+    position:relative; /* important(so we can absolutely position the description div */
+    display: inline-block;
+    height: 150px;
+    width: 150px;
+}
+
+.imgdesc {
+    position:absolute;
+    left: 0px;
+    top: 0px;
+    width: 150px;
+    height: 150px;
+    background-color: #222222;
+    font-size:15px;
+    color: #FF6600;
+    /*opacity: 0.9;
+    filter: alpha(opacity=90);*/
+}
+
+.imgstats {
+    padding:10px;
+    margin:0px;
+    vertical-align: middle;
+}
+
+.habouts {
+  width: 70%;
+  margin-left: 15%;
+  margin-right: 15%;
+  margin-top: 30px;
+  text-align: left;
+
+}
+
+.abouts {
+  width: 70%;
+  margin-left: 15%;
+  margin-right: 15%;
+  text-align: left;
+  vertical-align: top;
+
+}
+
+.contactframe {
+    height: 350px;      /* equals max image height */
+    width: 100%;
+    white-space: nowrap;
+    text-align: center;
+    display: inline-block;
+    padding-top: 50px;
+}
+
+.contactimg {
+    vertical-align: top;
+    max-height: 300px;
+    max-width: 300px;
+    outline: none;
+}
+
+map area {
+  outline: none;
+}
+
+.contacttext {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.aboutlink, .aboutlink:visited {
+  color: #999966;
+  text-decoration: none;
+}
+
+.aboutlink:hover, .aboutlink:active {
+  color: #FF6600;
+  text-decoration: none;
+}
