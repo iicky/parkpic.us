@@ -153,6 +153,7 @@ def writeCenMarkersJS(clusters):
         cdates = clusters[clusters.label== i].sort_values(by='taken', ascending=False)
         recents = cdates.square_link[0:3]
         cphotos = len(cdates.square_link)
+        cusers = cdates.username.nunique()
         for r in recents:
             outimg += "<img src='%s' class='img'>" % r
 
@@ -182,6 +183,8 @@ def writeCenMarkersJS(clusters):
         textboxhtml += "<span class='text-muted'><span class='markertext'>Latitude:</span> %s</span><br>" % (round(lat,2))
         textboxhtml += "<span class='text-muted'><span class='markertext'>Longitude:</span> %s</span><br>" % (round(lon,2))
         textboxhtml += "<span class='text-muted'><span class='markertext'># Photos:</span> %s</span><br>" % (cphotos)
+        textboxhtml += "<span class='text-muted'><span class='markertext'># Users:</span> %s</span><br>" % (cusers)
+
         outscript += """
                         google.maps.event.addListener(marker_%s, 'click',
                         getInfoCallback(map, "%s"));
@@ -340,4 +343,79 @@ def park_contact():
 def park_resume():
     return send_file('static/media/MPScherrer-Resume.pdf', 'MPScherrer-Resume.pdf')
 
+@app.route('/image', methods=['GET'])
+def imagetest():
+
+    # Get GET variables
+    parkname = request.args.get('parkname')
+    eps = request.args.get('eps')
+    min_samples = request.args.get('min_samples')
+    show = request.args.get('show')
+
+    # Check to see if parkname is in database
+    if not isParkInDB(parkname):
+        return render_template("input.html", the_result="Please enter a valid parkname.")
+
+    lat, lon, boundary = getParkInfo(parkname)
+    photos = getParkPhotos(parkname)
+
+    if len(photos) > 0:
+        clusters, noclusters = clusterPhotos(photos, eps, min_samples)
+
+        # Return photo carousel JSON
+        carousel = getClusterPhotosJSON(clusters)
+
+        # Get appropriate markers
+        markers = getMarkers(clusters, show)
+    else:
+        clusters, noclusters = 0, 0
+        markers = []
+        carousel = []
+
+    photomsg = 'Click a scene marker to explore.'
+    if noclusters == 0:
+        photomsg = 'There are no scenes to explore for this park.'
+
+    # Return park boundaries JavaScript
+    boundary = printGooglePoly(boundary)
+
+    return render_template("imagetest.html",
+                            parkname=parkname,
+                            nophotos=len(photos),
+                            lat=lat,
+                            lon=lon,
+                            noclusters=noclusters,
+                            markers=Markup(markers),
+                            carousel=Markup(carousel),
+                            boundary=Markup(boundary),
+                            photomsg=photomsg
+                            )
+
+@app.route('/map')
+def maptest():
+    return render_template("maptest.html")
+
+@app.route('/ind', methods=['GET'])
+def clustertest():
+
+   # Get GET variables
+    parkname = request.args.get('parkname')
+    eps = request.args.get('eps')
+    min_samples = request.args.get('min_samples')
+    show = request.args.get('show')
+
+    # Check to see if parkname is in database
+    if not isParkInDB(parkname):
+        return render_template("input.html", the_result="Please enter a valid parkname.")
+
+    lat, lon, boundary = getParkInfo(parkname)
+    photos = getParkPhotos(parkname)
+
+    if len(photos) > 0:
+        clusters, noclusters = clusterPhotos(photos, eps, min_samples)
+
+        # Return photo carousel JSON
+        carousel = getClusterPhotosJSON(clusters)
+
+    return Markup(carousel)
 
