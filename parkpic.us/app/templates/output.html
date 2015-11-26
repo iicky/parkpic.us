@@ -26,16 +26,21 @@
 
       var markers = [];
 
-      function initialize_map() {
-          var map = new google.maps.Map(
-          document.getElementById('parkmap'), {
-              center: new google.maps.LatLng({{lat}}, {{lon}}),
-              zoom: 10,
-              mapTypeId: google.maps.MapTypeId.ROADMAP
-          });
-          {{markers}}
-          {{boundary}}
-      }
+    function initialize_map() {
+        var mapOptions = {
+            center: new google.maps.LatLng({{lat}}, {{lon}}),
+            zoom: 10,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+
+    var map = new google.maps.Map(document.getElementById("parkmap"),
+    mapOptions);
+
+    var markerBounds = new google.maps.LatLngBounds();
+
+      {{markers}}
+
+      {{boundary}}
 
       var infowindow = new google.maps.InfoWindow();
 
@@ -46,7 +51,18 @@
                   infowindow.open(map, this);
               };
       }
-      google.maps.event.addDomListener(window, 'load', initialize_map);
+
+      map.fitBounds(markerBounds);
+
+      if(markers.length == 0){
+        var center = new google.maps.LatLng({{lat}}, {{lon}});
+        map.panTo(center);
+      }
+
+    }
+
+    google.maps.event.addDomListener(window, 'load', initialize_map);
+
 
   </script>
 

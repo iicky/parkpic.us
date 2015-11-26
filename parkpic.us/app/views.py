@@ -17,10 +17,12 @@ import sqlalchemy as sql
 def getParkPhotos(parkname):
     ''' Returns photos from a park
     '''
-    enginestr = 'mysql+pymysql://%s:%s@%s/parkpic' % (sec.mysqluser, sec.mysqlpwd, sec.mysqlhost)
+    enginestr = 'mysql+pymysql://%s:%s@%s/parkpic?charset=utf8&use_unicode=1' % (sec.mysqluser, sec.mysqlpwd, sec.mysqlhost)
     engine = sql.create_engine(enginestr)
 
-    query = """SELECT * FROM photos WHERE parkname="%s" AND in_park="True" AND canblog="1";""" % (parkname)
+    query = """SELECT * FROM photos WHERE parkname="%s" 
+            AND in_park="True" 
+            AND canblog="1";""" % (parkname)
     photos = pd.read_sql(query, engine, params={'encoding':'utf8'})
 
     photos['latitude'] = photos.latitude.astype('float')
@@ -31,7 +33,7 @@ def getParkPhotos(parkname):
 def isParkInDB(parkname):
     ''' Returns true if parkname in Database
     '''
-    enginestr = 'mysql+pymysql://%s:%s@%s/parkpic' % (sec.mysqluser, sec.mysqlpwd, sec.mysqlhost)
+    enginestr = 'mysql+pymysql://%s:%s@%s/parkpic?charset=utf8&use_unicode=1' % (sec.mysqluser, sec.mysqlpwd, sec.mysqlhost)
     engine = sql.create_engine(enginestr)
     
     query = "SELECT `parkname` FROM `parks` WHERE parkname=\"%s\";" % parkname
@@ -44,7 +46,7 @@ def isParkInDB(parkname):
 def getParkInfo(parkname):
     ''' Returns information about the park from Database
     '''
-    enginestr = 'mysql+pymysql://%s:%s@%s/parkpic' % (sec.mysqluser, sec.mysqlpwd, sec.mysqlhost)
+    enginestr = 'mysql+pymysql://%s:%s@%s/parkpic?charset=utf8&use_unicode=1' % (sec.mysqluser, sec.mysqlpwd, sec.mysqlhost)
     engine = sql.create_engine(enginestr)
     
     query = "SELECT `latitude`, `longitude`, `boundary` FROM `parks` WHERE parkname=\"%s\";" % parkname
@@ -56,7 +58,8 @@ def clusterPhotos(photos, eps=0.01, min_samples=10):
     '''
     locations = photos.as_matrix(columns=('longitude', 'latitude'))
     db = DBSCAN(eps=float(eps), min_samples=int(min_samples)).fit(locations)
-    labels = db.labels_
+    labels = db.labels_    
+    photos['core'] = [True if i in db.core_sample_indices_ else False for i in range(0, len(labels))]
     photos['label'] = labels
 
     return photos, labels.max()+1
@@ -127,7 +130,9 @@ def writeCenMarkersJS(clusters):
     jacSims = calcClusterSimilarities(clustertags)
 
     # Calculate the mean latitude and longitude for each cluster
+    #centers = clusters[clusters['core']!=False].groupby('label').mean()
     centers = clusters.groupby('label').mean()
+
     for i in range(0, len(centers.latitude)-1):
         cl = str(i+1)
         lat = round(centers.latitude[i],2)
@@ -159,13 +164,15 @@ def writeCenMarkersJS(clusters):
 
          # Output JavaScript for each marker
         outscript += """
+                        var Position = new google.maps.LatLng(%s, %s);
                         var marker_%s = new google.maps.Marker({
-                            position: new google.maps.LatLng(%s, %s),
+                            position: Position,
                             map: map,
                             icon: "static/icons/cen/number_%s.png"
                         });\n
                         markers.push(marker_%s);
-                    """ % (cl, lat, lon, cl, cl)
+                        markerBounds.extend(Position);
+                    """ % (centers.latitude[i], centers.longitude[i], cl, cl, cl)
 
         # Add click handle for each marker
         outscript += """
@@ -209,14 +216,28 @@ def writeIndMarkersJS(clusters):
             cl = str(clusters.label[i]+1)
             png = "number_"+cl
 
-        outscript += """var marker_i%s = new google.maps.Marker({
-                        position: new google.maps.LatLng(%s, %s),
-                        map: map,
-                        icon: "static/icons/ind/%s.png" 
+        # Write individual markers
+        outscript += """
+                        var Position = new google.maps.LatLng(%s, %s);
+                        var marker_i%s = new google.maps.Marker({
+                            position: Position,
+                            map: map,
+                            icon: "static/icons/ind/%s.png" 
                         });
+                        markerBounds.extend(Position);
+                    """ % (lat, lon, i, png)
+
+        textboxhtml = "<img src='%s'><br><br>" % square
+        textboxhtml += "<span class='text-muted'><span class='markertext'>Cluster:</span> %s</span><br>" % cl
+        textboxhtml += "<span class='text-muted'><span class='markertext'>Latitude:</span> %s</span><br>" % (round(lat,2))
+        textboxhtml += "<span class='text-muted'><span class='markertext'>Longitude:</span> %s</span><br>" % (round(lon,2))
+        textboxhtml += "<span class='text-muted'><span class='markertext'>Core Point:</span> %s</span><br>" % clusters.core[i]
+
+        # Infobox for markers
+        outscript += """
                         google.maps.event.addListener(marker_i%s, 'click', 
-                        getInfoCallback(map, "Cluster %s<br><img src='%s'><br>"));\n\n
-                    """ % (i, lat, lon, png, i, cl, square)
+                        getInfoCallback(map, "%s"));\n\n
+                    """ % (i, textboxhtml)
 
     return outscript
 
@@ -245,6 +266,7 @@ def printGooglePoly(boundary):
             coords = [{'lat':c[1], 'lng':c[0]} for coord in geom[i] for c in coord]
         except:
             coords = [{'lat':c[1], 'lng':c[0]} for c in geom[i]]
+
         js += """
                 var parkarea_%s = %s;
                 var parkpath_%s = new google.maps.Polyline({
@@ -256,6 +278,7 @@ def printGooglePoly(boundary):
                  });
                 parkpath_%s.setMap(map);
             """ % (i, json.dumps(coords), i, i, i)
+
     return js
 
 @app.route('/')
@@ -319,7 +342,6 @@ def autocomplete():
     with con.cursor() as cur:
         sql = """SELECT `parkname` FROM `parks` WHERE `parkname`
                  LIKE \"%s%%\" AND `type`='National'
-                 AND parkcode NOT IN ('DENA','GAAR','GLBA','KATM','LACL','WRST')
                  ORDER BY `parkname`;
                  """ % keyword
         cur.execute(sql)
@@ -342,80 +364,3 @@ def park_contact():
 @app.route('/resume')
 def park_resume():
     return send_file('static/media/MPScherrer-Resume.pdf', 'MPScherrer-Resume.pdf')
-
-@app.route('/image', methods=['GET'])
-def imagetest():
-
-    # Get GET variables
-    parkname = request.args.get('parkname')
-    eps = request.args.get('eps')
-    min_samples = request.args.get('min_samples')
-    show = request.args.get('show')
-
-    # Check to see if parkname is in database
-    if not isParkInDB(parkname):
-        return render_template("input.html", the_result="Please enter a valid parkname.")
-
-    lat, lon, boundary = getParkInfo(parkname)
-    photos = getParkPhotos(parkname)
-
-    if len(photos) > 0:
-        clusters, noclusters = clusterPhotos(photos, eps, min_samples)
-
-        # Return photo carousel JSON
-        carousel = getClusterPhotosJSON(clusters)
-
-        # Get appropriate markers
-        markers = getMarkers(clusters, show)
-    else:
-        clusters, noclusters = 0, 0
-        markers = []
-        carousel = []
-
-    photomsg = 'Click a scene marker to explore.'
-    if noclusters == 0:
-        photomsg = 'There are no scenes to explore for this park.'
-
-    # Return park boundaries JavaScript
-    boundary = printGooglePoly(boundary)
-
-    return render_template("imagetest.html",
-                            parkname=parkname,
-                            nophotos=len(photos),
-                            lat=lat,
-                            lon=lon,
-                            noclusters=noclusters,
-                            markers=Markup(markers),
-                            carousel=Markup(carousel),
-                            boundary=Markup(boundary),
-                            photomsg=photomsg
-                            )
-
-@app.route('/map')
-def maptest():
-    return render_template("maptest.html")
-
-@app.route('/ind', methods=['GET'])
-def clustertest():
-
-   # Get GET variables
-    parkname = request.args.get('parkname')
-    eps = request.args.get('eps')
-    min_samples = request.args.get('min_samples')
-    show = request.args.get('show')
-
-    # Check to see if parkname is in database
-    if not isParkInDB(parkname):
-        return render_template("input.html", the_result="Please enter a valid parkname.")
-
-    lat, lon, boundary = getParkInfo(parkname)
-    photos = getParkPhotos(parkname)
-
-    if len(photos) > 0:
-        clusters, noclusters = clusterPhotos(photos, eps, min_samples)
-
-        # Return photo carousel JSON
-        carousel = getClusterPhotosJSON(clusters)
-
-    return Markup(carousel)
-
