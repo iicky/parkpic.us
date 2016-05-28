@@ -1,0 +1,10 @@
+
+*.pyc
+
+parkpic.us/secrets.py
+
+*.wsgi
+
+parkpic.us/parkpic/secrets.py
+
+*.pyc

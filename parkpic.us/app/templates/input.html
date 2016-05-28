@@ -24,7 +24,8 @@
     <div class="menuspacer">
     </div>
     <div class="logoframe">
-        <span class="helper"></span><a href="/"><img class="logo" src="/static/images/logo.png" height=30 /></a>
+        <span class="helper"></span>
+        <a href="/"><img class="logo" src="/static/images/logo.png" height=30 /></a>
     </div>
     <div class="menu menuactive">
       <a href="/" class="menu menuactive">Explore</a>
@@ -47,7 +48,7 @@
       <h3 class="text-muted">Which U.S. National Park are you visiting?</h3>
     </div>
     <div id="theresult" class="text-muted">
-      {{the_result}}
+      {{message}}
     </div>
     <form action="/explore" method="get" id="parksearch" name="parksearch">
       <div id="input" class="input" style="text-align:center; vertical-align:middle">

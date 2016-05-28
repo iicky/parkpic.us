@@ -1,0 +1,211 @@
+<html>
+
+<head>
+
+  <!-- Bootstrap core CSS -->
+  <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link href="../static/css/parkstyle.css" rel="stylesheet">
+
+  <script>
+    var cphotos = {{carousel}};
+  </script>
+
+</head>
+
+<body>
+
+  <div >
+  <div id="c0" style="display:inline-block;" class="photoscroll noselect">0</div>
+  <div id="c1" style="display:inline-block;" class="photoscroll noselect">1</div>
+  <div id="c2" style="display:inline-block;" class="photoscroll noselect">2</div>
+</div>
+  <!-- Photos -->
+  <div id ="photos">
+    <h3 id="exploremsg" class ="text-muted" style="text-align: center;">
+      Click a scene marker to explore.
+    </h3>
+      <div id="topphotos">
+        <div id="scrollleft" class="photoscroll noselect">&#9668;</div>
+        <!-- Image 1 -->
+        <div class='imgwrapper'>
+          <img id="img1" class="topimg noselect" src="">
+          <div class='imgdesc'>
+            <a id="link1" class='imglink' href="" target="_blank">
+              <div class='imgsect'>
+                <div class='imgtitle'>Shot by</div>
+                <div id="user1" class='imgstats'></div>
+              </div>
+              <div class='imgsect'>
+                <div class='imgtitle'>Shot on</div>
+                <div id="date1" class='imgstats'></div>
+              </div>
+            </a>
+          </div>
+        </div>
+        <!-- Image 2 -->
+        <div class='imgwrapper'>
+          <img id="img2" class="topimg noselect" src="">
+          <div class='imgdesc'>
+            <a id="link2" class='imglink' href="" target="_blank">
+              <div class='imgsect'>
+                <div class='imgtitle'>Shot by</div>
+                <div id="user2" class='imgstats'></div>
+              </div>
+              <div class='imgsect'>
+                <div class='imgtitle'>Shot on</div>
+                <div id="date2" class='imgstats'></div>
+              </div>
+            </a>
+          </div>
+        </div>
+        <!-- Image 3 -->
+        <div class='imgwrapper'>
+          <img id="img3" class="topimg noselect" src="">
+          <div class='imgdesc'>
+            <a id="link3" class='imglink' href="" target="_blank">
+              <div class='imgsect'>
+                <div class='imgtitle'>Shot by</div>
+                <div id="user3" class='imgstats'></div>
+              </div>
+              <div class='imgsect'>
+                <div class='imgtitle'>Shot on</div>
+                <div id="date3" class='imgstats'></div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <div id="scrollright" class="photoscroll noselect">&#9658;</div>
+      </div>
+  </div>
+
+
+
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="../static/js/dateformat.js"></script>
+
+<script>
+
+var carousel = 0;
+var pind1 = 0;
+var pind2 = 1;
+var pind3 = 2;
+
+  function preload(arrayOfImages) {
+      $(arrayOfImages).each(function () {
+          $('<img />').attr('src',this['square_link']).appendTo('body').css('display','none');
+      });
+  };
+
+  var primeCarousel = function(c){
+
+    carousel = c;
+    pind1 = 0;
+    pind2 = 1;
+    pind3 = 2;
+
+    preload(cphotos[carousel]);
+
+    $('#img1').attr('src', cphotos[carousel][pind1]['square_link']);
+    $('#img2').attr('src', cphotos[carousel][pind2]['square_link']);
+    $('#img3').attr('src', cphotos[carousel][pind3]['square_link']);
+
+    $('#link1').attr('href',cphotos[carousel][pind1]['photopage']);
+    $('#link2').attr('href',cphotos[carousel][pind2]['photopage']);
+    $('#link3').attr('href',cphotos[carousel][pind3]['photopage']);
+
+    $('#user1').text(cphotos[carousel][pind1]['username']);
+    $('#user2').text(cphotos[carousel][pind2]['username']);
+    $('#user3').text(cphotos[carousel][pind3]['username']);
+
+    $('#date1').text(dateFormat(cphotos[carousel][pind1]['taken'], "mm/dd/yy hh:MM TT"));
+    $('#date2').text(dateFormat(cphotos[carousel][pind2]['taken'], "mm/dd/yy hh:MM TT"));
+    $('#date3').text(dateFormat(cphotos[carousel][pind3]['taken'], "mm/dd/yy hh:MM TT"));
+
+    $('#exploremsg').hide();
+    $('#topphotos').show();
+
+  };
+
+
+  $('#scrollright').click(function() {
+
+    pind1 += 1;
+    pind2 += 1;
+    pind3 += 1;
+
+    if(pind1 >= cphotos[carousel].length){ pind1 = 0; }
+    if(pind2 >= cphotos[carousel].length){ pind2 = 0; }
+    if(pind3 >= cphotos[carousel].length){ pind3 = 0; }
+
+    $('#img1').attr('src', cphotos[carousel][pind1]['square_link']);
+    $('#img2').attr('src', cphotos[carousel][pind2]['square_link']);
+    $('#img3').attr('src', cphotos[carousel][pind3]['square_link']);
+
+    $('#link1').attr('href',cphotos[carousel][pind1]['photopage']);
+    $('#link2').attr('href',cphotos[carousel][pind2]['photopage']);
+    $('#link3').attr('href',cphotos[carousel][pind3]['photopage']);
+
+    $('#user1').text(cphotos[carousel][pind1]['username']);
+    $('#user2').text(cphotos[carousel][pind2]['username']);
+    $('#user3').text(cphotos[carousel][pind3]['username']);
+
+    $('#date1').text(dateFormat(cphotos[carousel][pind1]['taken'], "mm/dd/yy hh:MM TT"));
+    $('#date2').text(dateFormat(cphotos[carousel][pind2]['taken'], "mm/dd/yy hh:MM TT"));
+    $('#date3').text(dateFormat(cphotos[carousel][pind3]['taken'], "mm/dd/yy hh:MM TT"));
+
+  });
+
+  $('#scrollleft').click(function() {
+
+    pind1 -= 1;
+    pind2 -= 1;
+    pind3 -= 1;
+
+    if(pind1 < 0){ pind1 = cphotos[carousel].length-1; }
+    if(pind2 < 0){ pind2 = cphotos[carousel].length-1; }
+    if(pind3 < 0){ pind3 = cphotos[carousel].length-1; }
+
+    $('#img1').attr('src', cphotos[carousel][pind1]['square_link']);
+    $('#img2').attr('src', cphotos[carousel][pind2]['square_link']);
+    $('#img3').attr('src', cphotos[carousel][pind3]['square_link']);
+
+    $('#link1').attr('href',cphotos[carousel][pind1]['photopage']);
+    $('#link2').attr('href',cphotos[carousel][pind2]['photopage']);
+    $('#link3').attr('href',cphotos[carousel][pind3]['photopage']);
+
+    $('#user1').text(cphotos[carousel][pind1]['username']);
+    $('#user2').text(cphotos[carousel][pind2]['username']);
+    $('#user3').text(cphotos[carousel][pind3]['username']);
+
+    $('#date1').text(dateFormat(cphotos[carousel][pind1]['taken'], "mm/dd/yy hh:MM TT"));
+    $('#date2').text(dateFormat(cphotos[carousel][pind2]['taken'], "mm/dd/yy hh:MM TT"));
+    $('#date3').text(dateFormat(cphotos[carousel][pind3]['taken'], "mm/dd/yy hh:MM TT"));
+
+  });
+
+
+
+  $('#c0').click(function () { primeCarousel(0); });
+  $('#c1').click(function () { primeCarousel(1); });
+  $('#c2').click(function () { primeCarousel(2); });
+
+  $('.imgdesc').each(function(){
+      $(this).css('opacity', 0);
+      $(this).css('display', 'block');
+  });
+
+  $('.imgwrapper').hover(function(){
+      $(this).children('.imgdesc').stop().fadeTo(500, 0.9);
+  },function(){
+      $(this).children('.imgdesc').stop().fadeTo(500, 0);
+  });
+
+
+</script>
+
+</body>
+
+</html>

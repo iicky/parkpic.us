@@ -13,59 +13,6 @@
 
   <title>parkpic.us</title>
 
-  <!-- Photo Carousel JSON -->
-  <script>
-  var cphotos = {{carousel}};
-  </script>
-
-  <!-- Google Maps Javascript -->
-  <script src="http://maps.googleapis.com/maps/api/js" type="text/javascript"></script>
-
-  <!-- Park Map Javascript -->
-  <script type="text/javascript">
-
-      var markers = [];
-
-    function initialize_map() {
-        var mapOptions = {
-            center: new google.maps.LatLng({{lat}}, {{lon}}),
-            zoom: 10,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
-        };
-
-    var map = new google.maps.Map(document.getElementById("parkmap"),
-    mapOptions);
-
-    var markerBounds = new google.maps.LatLngBounds();
-
-      {{markers}}
-
-      {{boundary}}
-
-      var infowindow = new google.maps.InfoWindow();
-
-      function getInfoCallback(map, content) {
-          return function() {
-                  infowindow.close();
-                  infowindow.setContent(content);
-                  infowindow.open(map, this);
-              };
-      }
-
-      map.fitBounds(markerBounds);
-
-      if(markers.length == 0){
-        var center = new google.maps.LatLng({{lat}}, {{lon}});
-        map.panTo(center);
-      }
-
-    }
-
-    google.maps.event.addDomListener(window, 'load', initialize_map);
-
-
-  </script>
-
 </head>
 
 <body>
@@ -180,29 +127,86 @@
 
   </div>
 
-
 </div>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="../static/js/dateformat.js"></script>
+
+<!-- Google Maps Javascript -->
+<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAyZQ9rquB1J1MO1QIWMMkxwZIFFCd15mo" type="text/javascript"></script>
+
+<!-- Google Maps Variables -->
+<script>
+  var map;
+  var parkcode = "{{parkcode}}";
+  var show = "{{show}}";
+  var markers = [];
+  var markerBounds = new google.maps.LatLngBounds();
+  var lat = {{lat}};
+  var lon = {{lon}};
+  var center = new google.maps.LatLng(lat, lon);
+  var boundaries, cenmarkers, indmarkers;
+
+  // Get boundaries
+  $.getJSON("boundary?parkcode="+parkcode, function(d) {
+      //draw_boundaries(d.boundaries);
+      boundaries = d.boundaries;
+  });
+  // Get center markers
+  if((show == 'cen' || show == 'all')){
+    $.getJSON("center?parkcode="+parkcode, function(d) {
+      cenmarkers = d.cenmarkers;
+    });
+  }
+  // Get individual markers
+  if((show == 'ind' || show == 'all')){
+    $.getJSON("individual?parkcode="+parkcode, function(d) {
+      indmarkers = d.indmarkers;
+    });
+  }
+</script>
+
+
+<!-- Photo Carousel Functions -->
 <script src="../static/js/photocarousel.js"></script>
+
+<!-- Photo Carousel JSON -->
+<script>
+  var cphotos;
+  $.getJSON("carousel?parkcode="+parkcode, function(b) {
+      cphotos = b['carousel'];
+  });
+</script>
+
+<!-- Park Map Helper Functions -->
+<script src="../static/js/mapfunctions.js"></script>
+
+<!-- Park Map Javascript -->
+<script type="text/javascript">
+
+  google.maps.event.addDomListener(window, 'load', initialize_map);
+  $(document).ajaxStop(function () {
+    draw_markers();
+  });
+
+</script>
 
 <script>
 
-$('#similarinfo').on('click', '.simscene', function () {
-  google.maps.event.trigger(markers[this.id], 'click');
-});
+  $('#similarinfo').on('click', '.simscene', function () {
+    google.maps.event.trigger(markers[this.id-1], 'click');
+  });
 
-$('.imgdesc').each(function(){
-    $(this).css('opacity', 0);
-    $(this).css('display', 'block');
-});
+  $('.imgdesc').each(function(){
+      $(this).css('opacity', 0);
+      $(this).css('display', 'block');
+  });
 
-$('.imgwrapper').hover(function(){
-    $(this).children('.imgdesc').stop().fadeTo(500, 0.9);
-},function(){
-    $(this).children('.imgdesc').stop().fadeTo(500, 0);
-});
+  $('.imgwrapper').hover(function(){
+      $(this).children('.imgdesc').stop().fadeTo(500, 0.9);
+  },function(){
+      $(this).children('.imgdesc').stop().fadeTo(500, 0);
+  });
 
 </script>
 

@@ -1,7 +1,7 @@
-  var carousel = 0;
-  var pind1 = 0;
-  var pind2 = 1;
-  var pind3 = 2;
+var carousel = 0;
+var pind1 = 0;
+var pind2 = 1;
+var pind3 = 2;
 
 function preload(arrayOfImages) {
     $(arrayOfImages).each(function () {
@@ -17,7 +17,6 @@ var primeCarousel = function(c){
     pind3 = 2;
 
     preload(cphotos[carousel]);
-
     $('#img1').attr('src', cphotos[carousel][pind1]['square_link']);
     $('#img2').attr('src', cphotos[carousel][pind2]['square_link']);
     $('#img3').attr('src', cphotos[carousel][pind3]['square_link']);
