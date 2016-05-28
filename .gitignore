@@ -8,3 +8,9 @@ parkpic.us/secrets.py
 parkpic.us/parkpic/secrets.py
 
 *.pyc
+
+parkpic.us/app/views.pyc
+
+parkpic.us/app/views.py.orig
+
+*.pyc
