@@ -12,7 +12,9 @@ class DB:
         self.client = MongoClient(
             'mongodb://%s:%s@%s:27017/parkpic' % (sec.mongouser,
                                                   sec.mongopwd,
-                                                  sec.mongohost))
+                                                  sec.mongohost),
+            connect=False)
+
         self.db = self.client.parkpic
 
         self.parks = self.db.parks
